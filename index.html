@@ -2147,24 +2147,27 @@ function saveToTeams() {
   });
 
   // no-cors fetch: Content-Type: text/plain is a CORS-safelisted simple header —
-  // no OPTIONS preflight fires, so it works from any HTTPS origin including
-  // Netlify. Power Automate receives the raw JSON string; triggerBody() returns
-  // it and json(string(triggerBody()))['fieldname'] parses it correctly.
-  // The response is always opaque (status=0, type="opaque") — .then() fires on
-  // any completed request, .catch() only on a genuine network failure.
+  // Uses CORS mode with application/json — PA supports CORS preflight (OPTIONS → 204)
+  // and returns 202 Accepted. With proper CORS we can read the actual status code
+  // and only show success on 202, so errors are caught and shown correctly.
+  // PA flow expressions should use triggerBody()?['fieldname'] directly.
   fetch(TEAMS_WEBHOOK_URL, {
     method: 'POST',
-    mode: 'no-cors',
-    headers: { 'Content-Type': 'text/plain' },
+    mode: 'cors',
+    headers: { 'Content-Type': 'application/json' },
     body: payload
-  }).then(function() {
-    btn.disabled = false;
-    btn.innerHTML = '<span>✅</span> Saved to Teams!';
-    if (status) { status.style.color = '#1a7a3c'; status.textContent = 'The summary has been saved to your Teams channel.'; }
-    setTimeout(function() {
-      btn.innerHTML = origBtnHTML;
-      if (status) status.textContent = '';
-    }, 4000);
+  }).then(function(response) {
+    if (response.status === 202 || response.ok) {
+      btn.disabled = false;
+      btn.innerHTML = '<span>✅</span> Saved to Teams!';
+      if (status) { status.style.color = '#1a7a3c'; status.textContent = 'The summary has been saved to your Teams channel.'; }
+      setTimeout(function() {
+        btn.innerHTML = origBtnHTML;
+        if (status) status.textContent = '';
+      }, 4000);
+    } else {
+      throw new Error('HTTP ' + response.status);
+    }
   }).catch(function() {
     btn.disabled = false;
     btn.innerHTML = origBtnHTML;
