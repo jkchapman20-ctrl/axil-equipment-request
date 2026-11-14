@@ -1,0 +1,2287 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Axil — New Equipment Request</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display&display=swap" />
+<style>
+  :root {
+    --navy: #1b3a5c;
+    --navy-dark: #122840;
+    --navy-light: #2d5a8e;
+    --orange: #e8640a;
+    --green: #2e7d32;
+    --green-light: #e8f5e9;
+    --red: #c62828;
+    --grey-bg: #f4f6f9;
+    --grey-border: #d0d7e2;
+    --grey-text: #5a6478;
+    --card-shadow: 0 2px 8px rgba(27,58,92,0.10);
+    --radius: 10px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Inter', system-ui, 'Segoe UI', sans-serif;
+    background: var(--grey-bg);
+    color: #1a2535;
+    min-height: 100vh;
+  }
+  body.modal-open { overflow: hidden; }
+
+  /* ── Site header — matches Axil Site Visit style ── */
+  .site-header {
+    background: var(--navy-dark);
+    color: #fff;
+    border-radius: 0 0 var(--radius) var(--radius);
+    padding: 24px 28px 22px;
+    position: relative;
+    overflow: hidden;
+    margin-bottom: 0;
+  }
+  /* Angled orange triangle watermark */
+  .site-header::before {
+    content: '';
+    position: absolute;
+    top: 0; right: 0;
+    width: 200px; height: 100%;
+    background: var(--orange);
+    clip-path: polygon(45% 0, 100% 0, 100% 100%, 0 100%);
+    opacity: .15;
+    pointer-events: none;
+  }
+  .site-header .hdr-pill {
+    font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase;
+    background: var(--orange); color: #fff;
+    padding: 3px 10px; border-radius: 20px;
+    display: inline-block; margin-bottom: 10px;
+    position: relative;
+  }
+  .site-header h1 {
+    font-family: 'DM Serif Display', Georgia, serif;
+    font-size: clamp(20px, 3.5vw, 28px);
+    font-weight: 400;
+    line-height: 1.2;
+    color: #fff;
+    position: relative;
+  }
+  .site-header .hdr-sub {
+    font-size: 12px;
+    color: rgba(255,255,255,.60);
+    margin-top: 5px;
+    position: relative;
+  }
+
+  .notice-bar {
+    background: #fff8f4;
+    border: 1.5px solid #f4c9ae;
+    color: #7a3010;
+    border-radius: var(--radius);
+    padding: 11px 18px;
+    font-size: 13px;
+    font-weight: 500;
+    margin-top: 16px;
+  }
+  .notice-bar strong { font-weight: 700; color: var(--orange); }
+
+  .page-wrap { max-width: 860px; margin: 0 auto; padding: 28px 20px 60px; }
+
+  .form-tabs {
+    display: flex;
+    margin-bottom: 28px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    box-shadow: var(--card-shadow);
+  }
+  .form-tab {
+    flex: 1;
+    padding: 18px 12px;
+    border: none;
+    cursor: pointer;
+    font-size: 15px;
+    font-weight: 700;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #d8e3ef;
+    color: var(--navy);
+  }
+  .form-tab:first-child { border-right: 1px solid #b8c8dc; }
+  .form-tab.active { background: var(--navy); color: white; }
+  .form-tab svg { height: 28px; width: auto; opacity: 0.55; transition: opacity 0.2s; }
+  .form-tab.active svg { opacity: 1; }
+
+  .progress-wrap {
+    background: white;
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--card-shadow);
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .prog-label { font-size: 13px; font-weight: 700; color: var(--navy); white-space: nowrap; }
+  .progress-bar-outer { flex: 1; height: 10px; background: var(--grey-border); border-radius: 10px; overflow: hidden; }
+  .progress-bar-inner { height: 100%; background: linear-gradient(90deg, var(--navy-light), var(--orange)); border-radius: 10px; width: 0%; transition: width 0.4s ease; }
+  .progress-pct { font-size: 13px; font-weight: 800; color: var(--orange); min-width: 36px; text-align: right; }
+
+  .instructions-card {
+    background: white;
+    border-left: 5px solid var(--navy-light);
+    border-radius: var(--radius);
+    padding: 18px 20px;
+    margin-bottom: 24px;
+    box-shadow: var(--card-shadow);
+    font-size: 14px;
+    line-height: 1.6;
+    color: var(--grey-text);
+  }
+  .instructions-card strong { color: var(--navy); }
+
+  .section-card {
+    background: white;
+    border-radius: var(--radius);
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    overflow: hidden;
+  }
+  .section-card.completed .section-header { background: var(--green); }
+  .section-header {
+    background: var(--navy);
+    color: white;
+    padding: 16px 20px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+  .section-num {
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    width: 32px; height: 32px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px; font-weight: 800; flex-shrink: 0;
+  }
+  .section-title { font-size: 16px; font-weight: 700; flex: 1; }
+  .section-badge {
+    background: rgba(255,255,255,0.15);
+    border-radius: 20px;
+    padding: 3px 10px;
+    font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  }
+  .section-badge.required { background: var(--orange); }
+  .section-tick { font-size: 20px; display: none; }
+  .section-card.completed .section-tick { display: block; }
+  .section-card.completed .section-badge { display: none; }
+
+  .section-body { padding: 20px; }
+  .summary-section-heading { font-size: 15px; font-weight: 800; color: var(--navy); background: #e8eef5; padding: 10px 16px; border-radius: 6px; margin: 16px 0 4px; letter-spacing: .03em; text-transform: uppercase; }
+  .section-note {
+    background: #fff8e1;
+    border: 1px solid #ffe082;
+    border-radius: 6px;
+    padding: 10px 14px;
+    font-size: 13px; color: #6d4c00;
+    margin-bottom: 16px;
+    display: flex; gap: 8px; align-items: flex-start;
+  }
+  .section-note .note-icon { font-size: 16px; flex-shrink: 0; }
+
+  .subsection {
+    border: 1.5px solid var(--grey-border);
+    border-radius: 8px;
+    margin-top: 16px;
+    overflow: hidden;
+  }
+  .subsection-header {
+    background: #eaf1fa;
+    padding: 10px 16px;
+    font-size: 13.5px; font-weight: 700; color: var(--navy);
+    border-bottom: 1px solid var(--grey-border);
+  }
+  .subsection-body { padding: 16px; }
+
+  .field { margin-bottom: 20px; }
+  .field:last-child { margin-bottom: 0; }
+  .field-label {
+    display: block;
+    font-size: 14px; font-weight: 700; color: var(--navy);
+    margin-bottom: 8px; line-height: 1.4;
+  }
+  .field-label .req-star { color: var(--red); margin-left: 3px; font-weight: 900; }
+  .field-hint { font-size: 12px; color: var(--grey-text); font-weight: 400; display: block; margin-top: 2px; }
+
+  .field input[type="text"], .field textarea {
+    width: 100%;
+    padding: 11px 14px;
+    border: 2px solid var(--grey-border);
+    border-radius: 6px;
+    font-size: 14px; font-family: inherit; color: #1a2535;
+    transition: border-color 0.2s; background: white;
+  }
+  .field input[type="text"]:focus, .field textarea:focus {
+    outline: none;
+    border-color: var(--navy-light);
+    box-shadow: 0 0 0 3px rgba(45,90,142,0.12);
+  }
+  .field textarea { min-height: 80px; resize: vertical; }
+
+  .radio-group, .checkbox-group { display: flex; flex-direction: column; gap: 8px; }
+  .radio-group.inline, .checkbox-group.inline { flex-direction: row; flex-wrap: wrap; gap: 10px; }
+
+  .radio-opt, .check-opt {
+    display: flex; align-items: center; gap: 10px;
+    padding: 11px 15px;
+    border: 2px solid var(--grey-border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.15s;
+    font-size: 14px; font-weight: 500;
+    background: white;
+    user-select: none;
+    min-height: 44px;
+  }
+  .radio-opt:hover, .check-opt:hover { border-color: var(--navy-light); background: #f0f5fc; }
+  .radio-opt.selected, .check-opt.selected {
+    border-color: var(--navy); background: #e8f0fb; color: var(--navy); font-weight: 700;
+  }
+  .radio-opt.selected-yes { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .radio-opt.selected-no { border-color: #546e7a; background: #eceff1; color: #37474f; }
+  .radio-opt input { display: none; }
+
+  /* Radio icon */
+  .radio-opt .opt-icon {
+    width: 20px; height: 20px; border-radius: 50%;
+    border: 2px solid var(--grey-border);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.15s;
+  }
+  .radio-opt.selected .opt-icon,
+  .radio-opt.selected-yes .opt-icon,
+  .radio-opt.selected-no .opt-icon { background: currentColor; border-color: currentColor; }
+  .radio-opt.selected .opt-icon::after,
+  .radio-opt.selected-yes .opt-icon::after,
+  .radio-opt.selected-no .opt-icon::after {
+    content: ''; width: 8px; height: 8px; border-radius: 50%; background: white;
+  }
+
+  /* Checkbox icon — using background-image tick, no pseudo-element needed */
+  .check-opt .opt-icon {
+    width: 22px; height: 22px; border-radius: 5px;
+    border: 2.5px solid var(--grey-border);
+    background: white;
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; transition: all 0.2s;
+    font-size: 14px; line-height: 1;
+  }
+  .check-opt.selected .opt-icon {
+    background: var(--navy);
+    border-color: var(--navy);
+    color: white;
+  }
+  .check-opt.selected .opt-icon::before { content: '✓'; color: white; font-weight: 900; font-size: 13px; }
+
+  .other-input-wrap { display: none; margin-top: 8px; }
+  .other-input-wrap.visible { display: block; }
+
+  /* Item detail sub-panel (shown when checkbox is ticked) */
+  .item-detail {
+    display: none;
+    margin-top: 6px;
+    margin-left: 32px;
+    padding: 12px 14px;
+    background: #eaf1fa;
+    border-left: 3px solid var(--navy-light);
+    border-radius: 0 6px 6px 0;
+    animation: fadeIn 0.15s ease;
+  }
+  .item-detail.visible { display: block; }
+  .item-detail .detail-row { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  .item-detail label { font-size: 12.5px; font-weight: 700; color: var(--navy); white-space: nowrap; }
+  .item-detail input[type="text"] {
+    flex: 1; min-width: 120px; padding: 7px 10px;
+    border: 1.5px solid var(--grey-border); border-radius: 5px;
+    font-size: 13px; font-family: inherit;
+  }
+  .item-detail .qty-btns { display: flex; gap: 4px; }
+  .qty-btn {
+    padding: 5px 12px;
+    border: 1.5px solid var(--grey-border);
+    border-radius: 5px;
+    background: white;
+    cursor: pointer;
+    font-size: 13px; font-weight: 700; color: var(--navy);
+    transition: all 0.12s;
+  }
+  .qty-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+  .qty-btn:hover:not(.active) { background: #f0f5fc; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+
+  .gate-row { display: flex; gap: 10px; }
+  .gate-btn {
+    flex: 1; padding: 15px;
+    border: 2.5px solid var(--grey-border);
+    border-radius: 8px; background: white;
+    cursor: pointer; font-size: 15px; font-weight: 700;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.15s; min-height: 52px;
+  }
+  .gate-btn:hover { border-color: var(--navy-light); background: #f0f5fc; }
+  .gate-btn.yes-btn.active { border-color: var(--green); background: var(--green-light); color: var(--green); }
+  .gate-btn.no-btn.active { border-color: #546e7a; background: #eceff1; color: #37474f; }
+
+  .conditional-fields { display: none; margin-top: 20px; }
+  .conditional-fields.visible { display: block; }
+
+  .field-divider { border: none; border-top: 1.5px dashed var(--grey-border); margin: 18px 0; }
+
+  .submit-area {
+    background: white; border-radius: var(--radius);
+    padding: 24px; box-shadow: var(--card-shadow);
+    text-align: center; margin-top: 28px;
+  }
+  .submit-area .submit-title { font-size: 17px; font-weight: 800; color: var(--navy); margin-bottom: 6px; }
+  .submit-area .submit-sub { font-size: 13px; color: var(--grey-text); margin-bottom: 20px; }
+
+  .btn-primary {
+    display: inline-flex; align-items: center; gap: 10px;
+    padding: 15px 36px;
+    background: var(--navy); color: white;
+    border: none; border-radius: 8px;
+    font-size: 16px; font-weight: 800;
+    cursor: pointer; letter-spacing: 0.3px;
+    box-shadow: 0 4px 14px rgba(27,58,92,0.3);
+    transition: background 0.2s;
+  }
+  .btn-primary:hover { background: var(--navy-light); }
+  .btn-secondary {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 24px;
+    background: white; color: var(--navy);
+    border: 2px solid var(--navy); border-radius: 8px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 12px; margin-left: 8px;
+    transition: all 0.2s;
+  }
+  .btn-secondary:hover { background: var(--grey-bg); }
+  .btn-outline {
+    display: inline-flex; align-items: center; gap: 8px;
+    padding: 11px 20px;
+    background: white; color: var(--orange);
+    border: 2px solid var(--orange); border-radius: 8px;
+    font-size: 14px; font-weight: 700;
+    cursor: pointer; margin-top: 12px; margin-left: 8px;
+    transition: all 0.2s;
+  }
+  .btn-outline:hover { background: #fff4ee; }
+  .btn-teams {
+    display: flex; align-items: center; justify-content: center; gap: 10px;
+    width: 100%; padding: 13px 24px;
+    background: #5558AF; color: white;
+    border: none; border-radius: 8px;
+    font-size: 15px; font-weight: 700;
+    cursor: pointer; transition: background 0.2s;
+  }
+  .btn-teams:hover { background: #444791; }
+  .btn-teams:disabled { background: #9999cc; cursor: not-allowed; }
+
+  /* ── MODAL ── */
+  .modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(10,20,40,0.72);
+    z-index: 9999;
+    overflow-y: auto;
+  }
+  .modal-overlay.open { display: block; }
+  .modal-inner {
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+    min-height: 100%;
+    padding: 30px 16px;
+  }
+  .modal-box {
+    background: white;
+    border-radius: var(--radius);
+    max-width: 760px; width: 100%;
+    padding: 32px;
+    box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+    position: relative;
+  }
+  .modal-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 24px; padding-bottom: 16px;
+    border-bottom: 2px solid var(--grey-border);
+  }
+  .modal-header h2 { font-size: 20px; color: var(--navy); }
+  .modal-close {
+    background: none; border: none; font-size: 24px;
+    cursor: pointer; color: var(--grey-text); line-height: 1;
+  }
+  .modal-close:hover { color: var(--navy); }
+  .summary-section { margin-bottom: 20px; }
+  .summary-section h3 {
+    font-size: 13px; font-weight: 800;
+    text-transform: uppercase; letter-spacing: 0.8px;
+    color: var(--navy); background: var(--grey-bg);
+    padding: 8px 12px; border-radius: 6px; margin-bottom: 10px;
+  }
+  .summary-row {
+    display: flex; padding: 7px 0;
+    border-bottom: 1px solid #eef0f4;
+    font-size: 13.5px; gap: 10px;
+  }
+  .summary-row .s-label { color: var(--grey-text); min-width: 220px; flex-shrink: 0; }
+  .summary-row .s-value { font-weight: 600; color: #1a2535; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 24px; flex-wrap: wrap; }
+
+  .sos-badge {
+    display: inline-block; background: var(--orange); color: white;
+    font-size: 11px; font-weight: 800; padding: 2px 8px;
+    border-radius: 20px; letter-spacing: 0.5px; margin-left: 6px;
+  }
+  .hidden { display: none !important; }
+
+  @media (max-width: 600px) {
+    .page-wrap { padding: 16px 12px 50px; }
+    .modal-box { padding: 20px; }
+    .summary-row { flex-direction: column; gap: 2px; }
+    .summary-row .s-label { min-width: unset; font-size: 12px; }
+    .item-detail .detail-row { flex-direction: column; align-items: flex-start; }
+  }
+
+  @media print {
+    body > * { display: none !important; }
+    #print-container { display: block !important; }
+    body { background: white !important; }
+    .summary-section-heading { background: #1b3a5c !important; color: white !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .summary-section h3 { background: #f4f6f9 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  #print-container {
+    display: none;
+    font-family: system-ui, -apple-system, sans-serif;
+    color: #1a1a1a;
+    padding: 24px;
+  }
+</style>
+</head>
+<body>
+
+<!-- ══ NO-JAVASCRIPT WARNING (shows in iOS Files app / any JS-disabled viewer) ══ -->
+<noscript>
+  <div style="
+    position:fixed;top:0;left:0;right:0;bottom:0;
+    background:#1b3a5c;color:white;
+    display:flex;flex-direction:column;align-items:center;justify-content:center;
+    text-align:center;padding:32px;
+    font-family:system-ui,-apple-system,sans-serif;
+    z-index:99999;
+  ">
+    <div style="font-size:56px;margin-bottom:16px;">⚠️</div>
+    <h1 style="font-size:24px;font-weight:800;margin:0 0 12px;">This form won't work here</h1>
+    <p style="font-size:17px;line-height:1.6;max-width:400px;margin:0 0 28px;opacity:0.9;">
+      This app has disabled the scripts this form needs.<br>
+      <strong>You must open it in a browser.</strong>
+    </p>
+    <div style="background:rgba(255,255,255,0.12);border-radius:12px;padding:20px 28px;max-width:400px;text-align:left;line-height:2;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:8px;text-align:center;">📱 iPhone / iPad</div>
+      <div style="font-size:15px;">1. Tap the <strong>Share</strong> button &nbsp;□↑</div>
+      <div style="font-size:15px;">2. Tap <strong>"Open in Safari"</strong></div>
+      <div style="font-size:15px;">3. The form will work normally</div>
+    </div>
+    <div style="margin-top:20px;background:rgba(255,255,255,0.12);border-radius:12px;padding:20px 28px;max-width:400px;text-align:left;line-height:2;">
+      <div style="font-size:15px;font-weight:700;margin-bottom:8px;text-align:center;">💻 Computer</div>
+      <div style="font-size:15px;">Open the file in <strong>Chrome</strong>, <strong>Edge</strong> or <strong>Safari</strong></div>
+    </div>
+  </div>
+</noscript>
+
+<header class="site-header">
+  <div class="hdr-pill">Axil Integrated Services</div>
+  <h1>New Equipment Request</h1>
+  <div class="hdr-sub">Step 1 of 2 — Initial Requirements &nbsp;·&nbsp; Complete all sections then generate your summary for the SOS &nbsp;·&nbsp; <span id="version-badge">v1.0</span></div>
+</header>
+
+<div class="notice-bar" style="margin:16px 0 0;">
+  ⚠ <strong>BDMs &amp; CMs:</strong> Complete this form fully before submitting to your SOS. All required fields must be filled. Missing information will delay the equipment specification.
+</div>
+
+<div class="page-wrap">
+  <div class="instructions-card">
+    <strong>📋 How to complete this form:</strong> Work through each section below.
+    For each type of equipment, answer <strong>Yes</strong> or <strong>No</strong> to whether it is required.
+    If <strong>Yes</strong>, complete all the follow-up questions that appear.
+    If <strong>No</strong>, move on — that section is done.
+    When finished, click <strong>Generate Summary</strong> to review and pass to your<span class="sos-badge">SOS</span>.
+    <br><br>
+    💾 <strong>Saving this form:</strong> Once complete, save a copy of this page to the shared folder <strong>(location TBC)</strong> so your SOS can access it.
+  </div>
+
+    <!-- ══════════════════════════════════════
+       SHARED: Customer Details (applies to both tabs)
+  ══════════════════════════════════════ -->
+  <div class="section-card" id="shared-s1" style="margin-bottom:0;border-radius:var(--radius) var(--radius) 0 0;">
+    <div class="section-header">
+      <div class="section-title">Customer Details</div>
+      <span class="section-badge required">REQUIRED</span>
+      <span class="section-tick">✅</span>
+    </div>
+    <div class="section-body">
+      <div class="field">
+        <label class="field-label">Customer / Site Name <span class="req-star">*</span></label>
+        <input type="text" id="cust-name" placeholder="e.g. Tesco Peterborough DC" oninput="updateProgress()" />
+      </div>
+      <div class="field">
+        <label class="field-label">Customer Address <span class="req-star">*</span></label>
+        <input type="text" id="cust-addr" placeholder="Full site address including postcode" oninput="updateProgress()" />
+      </div>
+      <div class="field">
+        <label class="field-label">Customer Point of Contact — Name &amp; Email <span class="req-star">*</span></label>
+        <input type="text" id="cust-contact" placeholder="e.g. John Smith — j.smith@customer.com" oninput="updateProgress()" />
+      </div>
+      <div class="field">
+        <label class="field-label">Any Special Site Circumstances to Consider
+          <span class="field-hint">e.g. ATEX Rated environment, food-grade requirements, restricted hours…</span>
+        </label>
+        <input type="text" id="cust-special" placeholder="State any special site requirements, or type N/A if none" oninput="updateProgress()" />
+      </div>
+      <div class="field">
+        <label class="field-label">Your Name (BDM / CM) <span class="req-star">*</span></label>
+        <input type="text" id="cust-bdm" placeholder="Your full name" oninput="updateProgress()" />
+      </div>
+    </div>
+  </div>
+
+
+  <div class="form-tabs">
+    <button class="form-tab active" id="tab-fixed" onclick="switchForm('fixed')">
+      <span style="font-size:22px;line-height:1">🏭</span> Fixed Plant Request
+    </button>
+    <button class="form-tab" id="tab-mobile" onclick="switchForm('mobile')">
+      <span style="font-size:22px;line-height:1">🚜</span> Mobile Plant Request
+    </button>
+  </div>
+
+  <div class="progress-wrap">
+    <span class="prog-label" id="progress-label">0 of 0 sections complete</span>
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="progress-bar"></div></div>
+    <span class="progress-pct" id="progress-pct">0%</span>
+  </div>
+
+  <!-- ══════════════════════════════════════
+       FIXED PLANT FORM
+  ══════════════════════════════════════ -->
+  <div id="form-fixed">
+
+    <!-- S2: Compactor -->
+    <div class="section-card" id="fp-s2">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">Compactor Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-compactor-fields">
+          <label class="field-label">Do you require a Compactor? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-compactor-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-compactor-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-compactor-fields">
+          <div class="subsection">
+            <div class="subsection-header">📦 Compactor — Specification 1</div>
+            <div class="subsection-body">
+              <div class="field">
+                <label class="field-label">Waste Material</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-waste"><span class="opt-icon"></span>General Waste</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-waste"><span class="opt-icon"></span>Cardboard</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-waste"><span class="opt-icon"></span>Poly / Plastic</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-waste" data-other="fp-comp1-waste-other"><span class="opt-icon"></span>Other</label>
+                </div>
+                <div class="other-input-wrap" id="fp-comp1-waste-other"><input type="text" placeholder="Please specify waste material…" /></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Loading Method</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-load"><span class="opt-icon"></span>Hopper Loaded (via FLT with Rotator or similar)</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-load"><span class="opt-icon"></span>Bin Lift — Comb Lift</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-load"><span class="opt-icon"></span>Bin Lift — Trunnion Lift</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-load" data-other="fp-comp1-load-other"><span class="opt-icon"></span>Other</label>
+                </div>
+                <div class="other-input-wrap" id="fp-comp1-load-other"><input type="text" placeholder="Please specify loading method…" /></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Orientation</label>
+                <div class="radio-group">
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient"><span class="opt-icon"></span>No Orientation Restriction</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient"><span class="opt-icon"></span>Rear Loader</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient"><span class="opt-icon"></span>Right Hand Loader</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient"><span class="opt-icon"></span>Left-Hand Loader</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient"><span class="opt-icon"></span>Unknown — To Be Confirmed</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-orient" data-other="fp-comp1-orient-other"><span class="opt-icon"></span>Other</label>
+                </div>
+                <div class="other-input-wrap" id="fp-comp1-orient-other"><input type="text" placeholder="Please specify orientation…" /></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Number of Compactors with this Specification <span class="req-star">*</span></label>
+                <div class="radio-group inline">
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-qty"><span class="opt-icon"></span>1</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-qty"><span class="opt-icon"></span>2</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-qty"><span class="opt-icon"></span>3</label>
+                  <label class="radio-opt"><input type="radio" name="fp-comp1-qty" data-other="fp-comp1-qty-other"><span class="opt-icon"></span>Other</label>
+                </div>
+                <div class="other-input-wrap" id="fp-comp1-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+              </div>
+              <div class="field">
+                <label class="field-label">Comments / Notable Requirements</label>
+                <input type="text" placeholder="Any specific requirements not covered above…" />
+              </div>
+            </div>
+          </div>
+          <hr class="field-divider" />
+          <div class="field" data-gate="fp-comp2-fields">
+            <label class="field-label">Do you need any other Compactor(s) with <em>different</em> specifications? <span class="req-star">*</span></label>
+            <div class="gate-row">
+              <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-comp2-fields',true)">✅ Yes — add Specification 2</button>
+              <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-comp2-fields',false)">❌ No — only one spec needed</button>
+            </div>
+          </div>
+          <div class="conditional-fields" id="fp-comp2-fields">
+            <div class="subsection">
+              <div class="subsection-header">📦 Compactor — Specification 2</div>
+              <div class="subsection-body">
+                <div class="field">
+                  <label class="field-label">Waste Material</label>
+                  <div class="radio-group">
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-waste"><span class="opt-icon"></span>General Waste</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-waste"><span class="opt-icon"></span>Cardboard</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-waste"><span class="opt-icon"></span>Poly / Plastic</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-waste" data-other="fp-comp2-waste-other"><span class="opt-icon"></span>Other</label>
+                  </div>
+                  <div class="other-input-wrap" id="fp-comp2-waste-other"><input type="text" placeholder="Please specify…" /></div>
+                </div>
+                <div class="field">
+                  <label class="field-label">Loading Method</label>
+                  <div class="radio-group">
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-load"><span class="opt-icon"></span>Hopper Loaded (via FLT with Rotator or similar)</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-load"><span class="opt-icon"></span>Bin Lift — Comb Lift</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-load"><span class="opt-icon"></span>Bin Lift — Trunnion Lift</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-load" data-other="fp-comp2-load-other"><span class="opt-icon"></span>Other</label>
+                  </div>
+                  <div class="other-input-wrap" id="fp-comp2-load-other"><input type="text" placeholder="Please specify…" /></div>
+                </div>
+                <div class="field">
+                  <label class="field-label">Orientation</label>
+                  <div class="radio-group">
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-orient"><span class="opt-icon"></span>No Orientation Restriction</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-orient"><span class="opt-icon"></span>Rear Loader</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-orient"><span class="opt-icon"></span>Right Hand Loader</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-orient"><span class="opt-icon"></span>Left-Hand Loader</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-orient" data-other="fp-comp2-orient-other"><span class="opt-icon"></span>Other</label>
+                  </div>
+                  <div class="other-input-wrap" id="fp-comp2-orient-other"><input type="text" placeholder="Please specify…" /></div>
+                </div>
+                <div class="field">
+                  <label class="field-label">Number of Compactors with this Specification <span class="req-star">*</span></label>
+                  <div class="radio-group inline">
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-qty"><span class="opt-icon"></span>1</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-qty"><span class="opt-icon"></span>2</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-qty"><span class="opt-icon"></span>3</label>
+                    <label class="radio-opt"><input type="radio" name="fp-comp2-qty" data-other="fp-comp2-qty-other"><span class="opt-icon"></span>Other</label>
+                  </div>
+                  <div class="other-input-wrap" id="fp-comp2-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+                </div>
+                <div class="field">
+                  <label class="field-label">Comments / Notable Requirements</label>
+                  <input type="text" placeholder="Any specific requirements not covered above…" />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S3: Vertical Baler -->
+    <div class="section-card" id="fp-s3">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Vertical Baler Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-vbaler-fields">
+          <label class="field-label">Do you require a Vertical Baler? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-vbaler-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-vbaler-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-vbaler-fields">
+          <div class="field">
+            <label class="field-label">Waste Material</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-vb-waste"><span class="opt-icon"></span>Cardboard</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-waste"><span class="opt-icon"></span>Poly / Plastic</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-waste" data-other="fp-vb-waste-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-vb-waste-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Approximate Weekly Volume of Waste to be Processed <span class="req-star">*</span></label>
+            <input type="text" placeholder="e.g. 5 tonnes/week or 20 m³/week" />
+          </div>
+          <div class="field">
+            <label class="field-label">Approximate Size of Cardboard at Point of Baling</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbsize"><span class="opt-icon"></span>Small pieces (under 1 metre in length / width)</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbsize"><span class="opt-icon"></span>Larger pieces (1–1.5 metre in length / width)</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbsize"><span class="opt-icon"></span>N/A — not cardboard</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbsize" data-other="fp-vb-cbsize-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-vb-cbsize-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Approximate Thickness of Cardboard at Point of Baling</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbthick"><span class="opt-icon"></span>Single Ply / Walled</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbthick"><span class="opt-icon"></span>Double Ply / Walled</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbthick"><span class="opt-icon"></span>Triple Ply / Walled</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-cbthick" data-other="fp-vb-cbthick-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-vb-cbthick-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Number of Vertical Balers Required</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="fp-vb-qty"><span class="opt-icon"></span>1</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-qty"><span class="opt-icon"></span>2</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-qty"><span class="opt-icon"></span>3</label>
+              <label class="radio-opt"><input type="radio" name="fp-vb-qty" data-other="fp-vb-qty-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-vb-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Comments / Notable Requirements</label>
+            <input type="text" placeholder="Any specific requirements not covered above…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S4: Horizontal Baler -->
+    <div class="section-card" id="fp-s4">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">Horizontal Semi-Auto Baler Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-hbaler-fields">
+          <label class="field-label">Do you require a Horizontal Baler? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-hbaler-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-hbaler-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-hbaler-fields">
+          <div class="field">
+            <label class="field-label">Loading Method</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-hb-load"><span class="opt-icon"></span>Open Hopper — Manually Loaded</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-load"><span class="opt-icon"></span>Wide Hopper — FLT Loaded</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-load"><span class="opt-icon"></span>Bin Lift — Comb Lift</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-load"><span class="opt-icon"></span>Bin Lift — Trunnion Lift</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-load" data-other="fp-hb-load-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-hb-load-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Orientation Requirements</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-hb-orient"><span class="opt-icon"></span>No Orientation Restrictions</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-orient"><span class="opt-icon"></span>Right Hand Ejection</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-orient"><span class="opt-icon"></span>Left Hand Ejection</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-orient" data-other="fp-hb-orient-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-hb-orient-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Number of Horizontal Semi-Auto Balers Required</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="fp-hb-qty"><span class="opt-icon"></span>1</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-qty"><span class="opt-icon"></span>2</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-qty"><span class="opt-icon"></span>3</label>
+              <label class="radio-opt"><input type="radio" name="fp-hb-qty" data-other="fp-hb-qty-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-hb-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Comments / Notable Requirements</label>
+            <input type="text" placeholder="Any specific requirements not covered above…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S5: Roll Packer -->
+    <div class="section-card" id="fp-s5">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">Roll Packer Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-roll-fields">
+          <label class="field-label">Do you require a Roll Packer? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-roll-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-roll-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-roll-fields">
+          <div class="field">
+            <label class="field-label">Weekly Volume of Wood Waste</label>
+            <input type="text" placeholder="e.g. 10 tonnes/week" />
+          </div>
+          <div class="field">
+            <label class="field-label">Roll Packer Type</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-roll-type"><span class="opt-icon"></span>Single</label>
+              <label class="radio-opt"><input type="radio" name="fp-roll-type"><span class="opt-icon"></span>Traversing</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Is a Safety Cage Required?</label>
+            <div class="section-note"><span class="note-icon">⚠️</span>Ops strongly recommends a safety cage on all Roll Packer installations.</div>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-roll-cage"><span class="opt-icon"></span>Yes (Ops Recommended)</label>
+              <label class="radio-opt"><input type="radio" name="fp-roll-cage"><span class="opt-icon"></span>No (Only applicable pending Ops review)</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Any Specific Site Restrictions or Requirements</label>
+            <input type="text" placeholder="Height restrictions, floor loading, access constraints…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S6: Fully Auto Baler -->
+    <div class="section-card" id="fp-s6">
+      <div class="section-header">
+        <div class="section-num">5</div>
+        <div class="section-title">Fully Auto Baler Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="section-note"><span class="note-icon">ℹ️</span>Suppliers recommend a Fully Automatic system where site processes <strong>1,500+ tonnes per annum</strong>.</div>
+        <div class="field" data-gate="fp-autobaler-fields">
+          <label class="field-label">Do you require a Fully Auto Baler? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-autobaler-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-autobaler-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-autobaler-fields">
+          <div class="field">
+            <label class="field-label">Loading Method <span class="req-star">*</span></label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-ab-load"><span class="opt-icon"></span>Open Hopper — Manually Loaded</label>
+              <label class="radio-opt"><input type="radio" name="fp-ab-load"><span class="opt-icon"></span>Wide Hopper — FLT Loaded</label>
+              <label class="radio-opt"><input type="radio" name="fp-ab-load"><span class="opt-icon"></span>Bin Lift — Comb Lift</label>
+              <label class="radio-opt"><input type="radio" name="fp-ab-load"><span class="opt-icon"></span>Bin Lift — Trunnion</label>
+              <label class="radio-opt"><input type="radio" name="fp-ab-load"><span class="opt-icon"></span>Conveyor Feed</label>
+              <label class="radio-opt"><input type="radio" name="fp-ab-load" data-other="fp-ab-load-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-ab-load-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Any Specific Site Restrictions or Requirements</label>
+            <input type="text" placeholder="Height restrictions, floor loading, access constraints…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S7: Wood Compactor -->
+    <div class="section-card" id="fp-s7">
+      <div class="section-header">
+        <div class="section-num">6</div>
+        <div class="section-title">Wood Compactor Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-wood-fields">
+          <label class="field-label">Do you require a Wood Compactor? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-wood-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-wood-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-wood-fields">
+          <div class="field">
+            <label class="field-label">Weekly Volume of Wood Waste</label>
+            <input type="text" placeholder="e.g. 8 tonnes/week" />
+          </div>
+          <div class="field">
+            <label class="field-label">Average Size of Wood Waste to be Processed</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-wood-size"><span class="opt-icon"></span>Euro Pallet</label>
+              <label class="radio-opt"><input type="radio" name="fp-wood-size"><span class="opt-icon"></span>Full Size 4-Way Pallet</label>
+              <label class="radio-opt"><input type="radio" name="fp-wood-size"><span class="opt-icon"></span>Oversized Pallet — 2m+</label>
+              <label class="radio-opt"><input type="radio" name="fp-wood-size" data-other="fp-wood-size-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-wood-size-other"><input type="text" placeholder="Please specify size…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Any Specific Site Restrictions or Requirements</label>
+            <input type="text" placeholder="Height restrictions, floor loading, access constraints…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S8: Porta Packer -->
+    <div class="section-card" id="fp-s8">
+      <div class="section-header">
+        <div class="section-num">7</div>
+        <div class="section-title">Porta Packer Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-porta-fields">
+          <label class="field-label">Do you require a Porta Packer? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-porta-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-porta-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="fp-porta-fields">
+          <div class="field">
+            <label class="field-label">Reason for Porta Packer instead of Static Compactor <span class="req-star">*</span></label>
+            <input type="text" placeholder="e.g. No fixed power, temporary installation, space constraints…" />
+          </div>
+          <div class="field">
+            <label class="field-label">Is a Safety Cage Required?</label>
+            <div class="section-note"><span class="note-icon">⚠️</span>Ops strongly recommends a safety cage on Porta Packer installations.</div>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="fp-porta-cage"><span class="opt-icon"></span>Yes (Ops Recommended)</label>
+              <label class="radio-opt"><input type="radio" name="fp-porta-cage"><span class="opt-icon"></span>No (Pending Ops Review)</label>
+              <label class="radio-opt"><input type="radio" name="fp-porta-cage" data-other="fp-porta-cage-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-porta-cage-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Are There Space Constraints on Site?</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="fp-porta-space"><span class="opt-icon"></span>Yes</label>
+              <label class="radio-opt"><input type="radio" name="fp-porta-space"><span class="opt-icon"></span>No</label>
+              <label class="radio-opt"><input type="radio" name="fp-porta-space" data-other="fp-porta-space-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="fp-porta-space-other"><input type="text" placeholder="Please describe…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Any Specific Site Restrictions or Requirements</label>
+            <input type="text" placeholder="Height restrictions, floor loading, access constraints…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- S9: Any Other Fixed Equipment — CHECKBOXES WITH DETAIL PANELS -->
+    <div class="section-card" id="fp-s9">
+      <div class="section-header">
+        <div class="section-num">8</div>
+        <div class="section-title">Any Other Fixed Equipment</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="fp-other-fields">
+          <label class="field-label">Is any other fixed equipment required?</label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'fp-other-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'fp-other-fields',false)">❌ No — nothing else needed</button>
+          </div>
+        </div>
+        <div class="conditional-fields visible" id="fp-other-fields">
+          <div class="field">
+            <label class="field-label">Tick all items required — then fill in the quantity and any notes for each one</label>
+            <div class="checkbox-group" id="fp-other-checks">
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Fixed Access Steps">
+                <span class="opt-icon"></span>Fixed Access Steps
+              </div>
+              <div class="item-detail" id="fp-other-detail-fixed-access-steps">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">3</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Notes / spec…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Can Crusher">
+                <span class="opt-icon"></span>Can Crusher
+              </div>
+              <div class="item-detail" id="fp-other-detail-can-crusher">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">3</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Notes / spec…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Drum Crusher">
+                <span class="opt-icon"></span>Drum Crusher
+              </div>
+              <div class="item-detail" id="fp-other-detail-drum-crusher">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Drum type / size…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Dolav / Bin Washer">
+                <span class="opt-icon"></span>Dolav / Bin Washer
+              </div>
+              <div class="item-detail" id="fp-other-detail-dolav-bin-washer">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Bin size / type…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="EPS Baler">
+                <span class="opt-icon"></span>EPS Baler (Polystyrene)
+              </div>
+              <div class="item-detail" id="fp-other-detail-eps-baler">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Weekly EPS volume…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Sorting Station (Single Person)">
+                <span class="opt-icon"></span>Sorting Station — Single Person
+              </div>
+              <div class="item-detail" id="fp-other-detail-sorting-station-single-person">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Waste streams / notes…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Sorting Conveyor (Multiple People)">
+                <span class="opt-icon"></span>Sorting Conveyor — Multiple People
+              </div>
+              <div class="item-detail" id="fp-other-detail-sorting-conveyor-multiple-people">
+                <div class="detail-row">
+                  <label>No. of pickers:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">3</button>
+                    <button class="qty-btn" onclick="setQty(this)">4+</button>
+                    <button class="qty-btn" onclick="setQty(this)">TBC</button>
+                  </div>
+                  <input type="text" placeholder="Waste streams / belt length…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Bin Weighing System">
+                <span class="opt-icon"></span>Bin Weighing System
+              </div>
+              <div class="item-detail" id="fp-other-detail-bin-weighing-system">
+                <div class="detail-row">
+                  <label>Bin type:</label>
+                  <input type="text" placeholder="e.g. 1100L Euro, mixed sizes…" />
+                  <input type="text" placeholder="Integration requirements…" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Welfare Facility / Cabin">
+                <span class="opt-icon"></span>Welfare Facility / Cabin
+              </div>
+              <div class="item-detail" id="fp-other-detail-welfare-facility-cabin">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Size, facilities needed, temp or permanent…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Shelter / Canopy">
+                <span class="opt-icon"></span>Shelter / Canopy
+              </div>
+              <div class="item-detail" id="fp-other-detail-shelter-canopy">
+                <div class="detail-row">
+                  <label>Approx. size:</label>
+                  <input type="text" placeholder="e.g. 10m x 6m" />
+                  <input type="text" placeholder="Purpose / notes…" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Other free text -->
+            <div style="margin-top:12px">
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="fp-other" data-name="Other Fixed Equipment" id="fp-other-misc-toggle">
+                <span class="opt-icon"></span>Other — not listed above
+              </div>
+              <div class="item-detail" id="fp-other-detail-other-fixed-equipment">
+                <div class="detail-row">
+                  <input type="text" placeholder="Describe the equipment required, including quantity and any specification…" style="width:100%" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-title">🏭 Ready to submit your Fixed Plant request?</div>
+
+    </div>
+
+  </div><!-- /form-fixed -->
+
+
+  <!-- ══════════════════════════════════════
+       MOBILE PLANT FORM
+  ══════════════════════════════════════ -->
+  <div id="form-mobile" class="hidden">
+
+    <!-- M2: Forklift -->
+    <div class="section-card" id="mp-s2">
+      <div class="section-header">
+        <div class="section-num">1</div>
+        <div class="section-title">Forklift Truck Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="mp-flt-fields">
+          <label class="field-label">Do you require one or more Forklift Trucks? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'mp-flt-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'mp-flt-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="mp-flt-fields">
+          <div class="field">
+            <label class="field-label">Number of Forklifts Required</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-flt-qty"><span class="opt-icon"></span>1</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-qty"><span class="opt-icon"></span>2</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-qty"><span class="opt-icon"></span>3</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-qty" data-other="mp-flt-qty-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-flt-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Fuel Type</label>
+            <div class="section-note"><span class="note-icon">🔋</span>Electric is recommended as the default where possible — lower emissions, quieter, lower running costs.</div>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-flt-fuel"><span class="opt-icon"></span>⚡ Electric (Recommended)</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-fuel"><span class="opt-icon"></span>🔵 LPG</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-fuel"><span class="opt-icon"></span>⛽ Diesel</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-fuel"><span class="opt-icon"></span>Not yet specified</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Forklift Size</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>1.5 Tonne</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>2 Tonne</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>2.5 Tonne</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>3 Tonne</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>3.5 Tonne</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size"><span class="opt-icon"></span>Unknown — SOS to advise</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-size" data-other="mp-flt-size-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-flt-size-other"><input type="text" placeholder="Please specify…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Special Attachments Required</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach"><span class="opt-icon"></span>Standard Forks</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach"><span class="opt-icon"></span>Fixed Long Forks</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach"><span class="opt-icon"></span>Rotator</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach"><span class="opt-icon"></span>Clamp Forks</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach"><span class="opt-icon"></span>Rotator &amp; Clamp Forks</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-attach" data-other="mp-flt-attach-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-flt-attach-other"><input type="text" placeholder="Please specify attachment…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">What Make are the Current / Customer Forklifts on Site?
+              <span class="field-hint">Helps ensure fleet compatibility.</span>
+            </label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-flt-make"><span class="opt-icon"></span>Linde</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-make"><span class="opt-icon"></span>Toyota</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-make"><span class="opt-icon"></span>Jungheinrich</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-make"><span class="opt-icon"></span>Heli</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-make"><span class="opt-icon"></span>Unknown</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-make" data-other="mp-flt-make-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-flt-make-other"><input type="text" placeholder="Please specify make…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Operating Environment</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-flt-env"><span class="opt-icon"></span>🏢 Inside Only</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-env"><span class="opt-icon"></span>🌧️ Outside Only</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-env"><span class="opt-icon"></span>🔄 Both</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Will the Forklift Operate on a Public Highway?</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-flt-highway"><span class="opt-icon"></span>Yes</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-highway"><span class="opt-icon"></span>No</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-highway"><span class="opt-icon"></span>Unknown</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Non-Marking Tyres Required?
+              <span class="field-hint">Required for food environments, clean areas or polished floors.</span>
+            </label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-flt-tyres"><span class="opt-icon"></span>Yes</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-tyres"><span class="opt-icon"></span>No</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-tyres"><span class="opt-icon"></span>Unknown</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Will the Forklift be Used for Towing?</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-flt-tow"><span class="opt-icon"></span>Yes</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-tow"><span class="opt-icon"></span>No</label>
+              <label class="radio-opt"><input type="radio" name="mp-flt-tow"><span class="opt-icon"></span>Unknown</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Comments / Notable Requirements</label>
+            <input type="text" placeholder="Any specific requirements not covered above…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M3: Electric Vehicle -->
+    <div class="section-card" id="mp-s3">
+      <div class="section-header">
+        <div class="section-num">2</div>
+        <div class="section-title">Electric Vehicle Requirements (ETV / EV)</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="mp-ev-fields">
+          <label class="field-label">Do you require Electric Vehicles (EVs / ETVs)? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'mp-ev-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'mp-ev-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="mp-ev-fields">
+          <div class="field">
+            <label class="field-label">Container Towing or Trailer Requirement</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-ev-tow"><span class="opt-icon"></span>Tow system already in place</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-tow"><span class="opt-icon"></span>New tow system required</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-tow"><span class="opt-icon"></span>Trailer required</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Operating Environment</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-ev-env"><span class="opt-icon"></span>🏢 Inside Only</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-env"><span class="opt-icon"></span>🌧️ Outside Only</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-env"><span class="opt-icon"></span>🔄 Both</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Will the EV Operate on a Public Highway?</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-ev-highway"><span class="opt-icon"></span>Yes</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-highway"><span class="opt-icon"></span>No</label>
+              <label class="radio-opt"><input type="radio" name="mp-ev-highway"><span class="opt-icon"></span>Unknown</label>
+            </div>
+          </div>
+          <div class="field">
+            <label class="field-label">Comments / Notable Requirements</label>
+            <input type="text" placeholder="Any specific requirements not covered above…" />
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M4: Tipper Skips -->
+    <div class="section-card" id="mp-s4">
+      <div class="section-header">
+        <div class="section-num">3</div>
+        <div class="section-title">Tipper Skip Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="mp-skip-fields">
+          <label class="field-label">Do you require Tipper Skips? <span class="req-star">*</span></label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'mp-skip-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'mp-skip-fields',false)">❌ No</button>
+          </div>
+        </div>
+        <div class="conditional-fields" id="mp-skip-fields">
+          <div class="field">
+            <label class="field-label">Tipper Skip Size</label>
+            <div class="radio-group">
+              <label class="radio-opt"><input type="radio" name="mp-skip-size"><span class="opt-icon"></span>600 Litre</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-size"><span class="opt-icon"></span>1,100 Litre</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-size"><span class="opt-icon"></span>1,600 Litre</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-size"><span class="opt-icon"></span>Unknown — SOS to advise</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-size" data-other="mp-skip-size-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-skip-size-other"><input type="text" placeholder="Please specify size…" /></div>
+          </div>
+          <div class="field">
+            <label class="field-label">Number of Tipper Skips Required</label>
+            <div class="radio-group inline">
+              <label class="radio-opt"><input type="radio" name="mp-skip-qty"><span class="opt-icon"></span>1</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-qty"><span class="opt-icon"></span>2</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-qty"><span class="opt-icon"></span>3</label>
+              <label class="radio-opt"><input type="radio" name="mp-skip-qty" data-other="mp-skip-qty-other"><span class="opt-icon"></span>Other</label>
+            </div>
+            <div class="other-input-wrap" id="mp-skip-qty-other"><input type="text" placeholder="Specify quantity…" /></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- M5: Any Other Mobile Plant — EXPANDED + CHECKBOXES WITH DETAIL PANELS -->
+    <div class="section-card" id="mp-s5">
+      <div class="section-header">
+        <div class="section-num">4</div>
+        <div class="section-title">Any Other Mobile Plant Requirements</div>
+        <span class="section-badge">SECTION</span>
+        <span class="section-tick">✅</span>
+      </div>
+      <div class="section-body">
+        <div class="field" data-gate="mp-other-fields">
+          <label class="field-label">Is any other mobile plant required?</label>
+          <div class="gate-row">
+            <button class="gate-btn yes-btn" onclick="toggleGate(this,'mp-other-fields',true)">✅ Yes</button>
+            <button class="gate-btn no-btn" onclick="toggleGate(this,'mp-other-fields',false)">❌ No — nothing else needed</button>
+          </div>
+        </div>
+        <div class="conditional-fields visible" id="mp-other-fields">
+          <div class="field">
+            <label class="field-label">Tick all items required — then fill in quantity and notes for each one</label>
+            <div class="checkbox-group" id="mp-other-checks">
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="360 Grab / Excavator">
+                <span class="opt-icon"></span>360 Grab / Excavator
+              </div>
+              <div class="item-detail" id="mp-other-detail-360-grab-excavator">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Grab type, weight class, cab spec…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Telehandler">
+                <span class="opt-icon"></span>Telehandler
+              </div>
+              <div class="item-detail" id="mp-other-detail-telehandler">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Lift capacity, reach, attachments…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Reach Truck / Narrow Aisle Truck">
+                <span class="opt-icon"></span>Reach Truck / Narrow Aisle Truck
+              </div>
+              <div class="item-detail" id="mp-other-detail-reach-truck-narrow-aisle-truck">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Lift height, aisle width, fuel…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Pedestrian Electric Stacker / Pallet Truck">
+                <span class="opt-icon"></span>Pedestrian Electric Stacker / Pallet Truck
+              </div>
+              <div class="item-detail" id="mp-other-detail-pedestrian-electric-stacker-pallet-truck">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">3</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Lift height, load capacity…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Scissor Lift / MEWP">
+                <span class="opt-icon"></span>Scissor Lift / MEWP (Working at Height)
+              </div>
+              <div class="item-detail" id="mp-other-detail-scissor-lift-mewp">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Max working height, indoor/outdoor…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Ride-On Sweeper / Scrubber Dryer">
+                <span class="opt-icon"></span>Ride-On Sweeper / Scrubber Dryer
+              </div>
+              <div class="item-detail" id="mp-other-detail-ride-on-sweeper-scrubber-dryer">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Floor area, surface type, indoor/outdoor…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Bin Towing Frames">
+                <span class="opt-icon"></span>Bin Towing Frames
+              </div>
+              <div class="item-detail" id="mp-other-detail-bin-towing-frames">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Bin size, single or multi-bin train…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Road Sweeper">
+                <span class="opt-icon"></span>Road Sweeper
+              </div>
+              <div class="item-detail" id="mp-other-detail-road-sweeper">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Area size, road type, notes…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Mobile Floor Scale / Weighbridge Unit">
+                <span class="opt-icon"></span>Mobile Floor Scale / Weighbridge Unit
+              </div>
+              <div class="item-detail" id="mp-other-detail-mobile-floor-scale-weighbridge-unit">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Max weighing capacity, integration needed…" style="margin-left:8px" />
+                </div>
+              </div>
+
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Tow Tractor / Tugger">
+                <span class="opt-icon"></span>Tow Tractor / Tugger
+              </div>
+              <div class="item-detail" id="mp-other-detail-tow-tractor-tugger">
+                <div class="detail-row">
+                  <label>Quantity:</label>
+                  <div class="qty-btns">
+                    <button class="qty-btn" onclick="setQty(this)">1</button>
+                    <button class="qty-btn" onclick="setQty(this)">2</button>
+                    <button class="qty-btn" onclick="setQty(this)">Other</button>
+                  </div>
+                  <input type="text" placeholder="Tow capacity, train length, fuel type…" style="margin-left:8px" />
+                </div>
+              </div>
+
+            </div>
+
+            <!-- Other free text -->
+            <div style="margin-top:12px">
+              <div class="check-opt" onclick="toggleCheck(this)" data-item="mp-other" data-name="Other Mobile Plant">
+                <span class="opt-icon"></span>Other — not listed above
+              </div>
+              <div class="item-detail" id="mp-other-detail-other-mobile-plant">
+                <div class="detail-row">
+                  <input type="text" placeholder="Describe the equipment required, including quantity and any specification…" style="width:100%" />
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="submit-area">
+      <div class="submit-title">🚜 Ready to submit your Mobile Plant request?</div>
+
+    </div>
+
+  </div><!-- /form-mobile -->
+
+  <!-- ── COMBINED GENERATE BUTTON ───────────────────── -->
+  <div class="submit-wrap" style="margin-top:28px;">
+    <div class="submit-sub">Review your answers for both Fixed and Mobile Plant, then generate your combined summary for the SOS.</div>
+    <button class="btn-primary" onclick="generateSummary()">📋 Generate Full Summary for SOS</button>
+  </div>
+
+
+
+</div><!-- /page-wrap -->
+
+<!-- ══ SUMMARY MODAL ══ -->
+<div class="modal-overlay" id="summary-modal">
+  <div class="modal-inner">
+    <div class="modal-box">
+      <div class="modal-header">
+        <h2 id="modal-title">📋 Equipment Request Summary</h2>
+        <button class="modal-close" onclick="closeModal()">✕</button>
+      </div>
+      <div id="modal-body"></div>
+      <div style="background:#fff8f4;border:1.5px solid #f4c9ae;border-radius:8px;padding:11px 16px;margin-top:20px;font-size:13px;color:#7a3010;display:flex;flex-direction:column;gap:7px;">
+        <div>💾 <strong>Remember:</strong> Once printed or saved, file a copy in the shared folder <strong>(location TBC)</strong> so your SOS can access it.</div>
+        <div>⚠️ <strong>BDMs &amp; CMs:</strong> Missing information will delay the equipment specification and quotes back to you — ensure all sections are fully completed before submitting.</div>
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeModal()">← Go Back &amp; Edit</button>
+        <button class="btn-outline" id="copy-btn" onclick="copySummary()">📋 Copy Text</button>
+        <button class="btn-outline" id="dl-btn" onclick="downloadSummary()">⬇️ Download / Share</button>
+        <button class="btn-primary" id="print-btn" onclick="printSummary()">🖨️ Print / PDF</button>
+      </div>
+      <!-- Teams save button — shown only when TEAMS_WEBHOOK_URL is configured -->
+      <div id="teams-save-wrap" style="display:none;margin-top:12px;">
+        <button class="btn-teams" id="teams-btn" onclick="saveToTeams()">
+          <svg width="18" height="18" viewBox="0 0 2228 2228" fill="none" xmlns="http://www.w3.org/2000/svg" style="flex-shrink:0"><path d="M1554 674c61 0 111-50 111-112s-50-111-111-111c-61 0-111 50-111 111s50 112 111 112z" fill="#fff"/><path d="M1943 779h-477v760c0 185-150 335-335 335s-335-150-335-335V779H319c-93 0-168 75-168 168v744c0 94 75 169 168 169h280l84 280 280-280h980c93 0 168-75 168-169V947c0-93-75-168-168-168z" fill="#fff"/><path d="M1131 509c0 150-122 272-272 272S587 659 587 509 709 237 859 237s272 122 272 272z" fill="#fff"/></svg>
+          Save to Teams
+        </button>
+        <div id="teams-status" style="margin-top:8px;font-size:12px;text-align:center;min-height:18px;"></div>
+      </div>
+      <div id="save-hint" style="margin-top:10px;font-size:12px;color:#666;text-align:center;line-height:1.6;">
+        💡 On iPhone tap <strong>Download / Share</strong> to send directly to Teams or save to Files.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ── VERSION ────────────────────────────────────────────
+const FORM_VERSION = "1.0";
+
+// ── TEAMS INTEGRATION ──────────────────────────────────
+// Paste your Power Automate HTTP trigger URL below.
+// Leave blank to hide the "Save to Teams" button.
+// Setup guide: see comment block at bottom of this file.
+const TEAMS_WEBHOOK_URL = "https://defaulta8e30f7e049f4cbf87bc25364b14eb.a1.environment.api.powerplatform.com:443/powerautomate/automations/direct/cu/31/workflows/139aa94b3d2748f5acdb5ac8efeafe8a/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=9kdcBQU2VZnY0bbsgGazUCo1hh3UqLMRPQFtVpu5BI4";
+
+// ── STATE ──────────────────────────────────────────────
+let currentForm = 'fixed';
+document.addEventListener('DOMContentLoaded', () => {
+  const badge = document.getElementById('version-badge');
+  if (badge) badge.textContent = 'v' + FORM_VERSION;
+});
+
+// ── TAB SWITCHING ──────────────────────────────────────
+function switchForm(form) {
+  currentForm = form;
+  document.getElementById('form-fixed').classList.toggle('hidden', form !== 'fixed');
+  document.getElementById('form-mobile').classList.toggle('hidden', form !== 'mobile');
+  document.getElementById('tab-fixed').classList.toggle('active', form === 'fixed');
+  document.getElementById('tab-mobile').classList.toggle('active', form === 'mobile');
+  updateProgress();
+}
+
+// ── GATE TOGGLE ────────────────────────────────────────
+function toggleGate(btn, targetId, isYes) {
+  const parent = btn.closest('.field');
+  parent.querySelector('.yes-btn').classList.toggle('active', isYes);
+  parent.querySelector('.no-btn').classList.toggle('active', !isYes);
+  const target = document.getElementById(targetId);
+  if (target) target.classList.toggle('visible', isYes);
+  updateProgress();
+  updateSectionStatus(btn.closest('.section-card'));
+}
+
+// ── RADIO OPTS ─────────────────────────────────────────
+document.addEventListener('click', function(e) {
+  const opt = e.target.closest('.radio-opt');
+  if (!opt || !opt.querySelector('input[type="radio"]')) return;
+
+  const name = opt.querySelector('input[type="radio"]').name;
+  if (!name) return;
+
+  document.querySelectorAll(`input[name="${name}"]`).forEach(inp => {
+    inp.closest('.radio-opt').classList.remove('selected', 'selected-yes', 'selected-no');
+  });
+
+  const isYes = /^\s*(✅|Yes|Electric \(Recommended\))/.test(opt.textContent.trim());
+  const isNo  = /^\s*(❌|No —|No$)/.test(opt.textContent.trim());
+  opt.classList.add(isYes ? 'selected-yes' : isNo ? 'selected-no' : 'selected');
+
+  const inp = opt.querySelector('input[type="radio"]');
+  // Handle other-field show/hide
+  if (inp.dataset.other) {
+    document.getElementById(inp.dataset.other)?.classList.add('visible');
+  } else {
+    document.querySelectorAll(`input[name="${name}"][data-other]`).forEach(r => {
+      document.getElementById(r.dataset.other)?.classList.remove('visible');
+    });
+  }
+
+  updateProgress();
+  updateSectionStatus(opt.closest('.section-card'));
+}, true);
+
+// ── CHECKBOX TOGGLE ────────────────────────────────────
+function toggleCheck(el) {
+  el.classList.toggle('selected');
+  // Show/hide item detail panel
+  const name = el.dataset.name;
+  if (name) {
+    const detailId = 'detail-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const prefix = el.dataset.item || '';
+    const panel = document.getElementById(prefix + '-' + detailId) ||
+                  document.getElementById(detailId);
+    if (panel) panel.classList.toggle('visible', el.classList.contains('selected'));
+  }
+  updateProgress();
+  updateSectionStatus(el.closest('.section-card'));
+}
+
+// ── QTY BUTTONS ────────────────────────────────────────
+function setQty(btn) {
+  const siblings = btn.closest('.qty-btns').querySelectorAll('.qty-btn');
+  siblings.forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+}
+
+// ── SECTION STATUS ─────────────────────────────────────
+function updateSectionStatus(card) {
+  if (!card) return;
+  const gates = card.querySelectorAll('[data-gate]');
+  if (gates.length === 0) {
+    // Required section — text inputs
+    const inputs = card.querySelectorAll('input[type="text"]');
+    const allFilled = inputs.length > 0 && Array.from(inputs).every(i => i.value.trim() !== '');
+    card.classList.toggle('completed', allFilled);
+    return;
+  }
+  // Only check gates that are visible (not inside a hidden conditional-fields panel)
+  const visibleGates = Array.from(gates).filter(g => {
+    const parent = g.closest('.conditional-fields');
+    return !parent || parent.classList.contains('visible');
+  });
+  const allAnswered = visibleGates.length > 0 && visibleGates.every(g => g.querySelector('.gate-btn.active') !== null);
+  card.classList.toggle('completed', allAnswered);
+}
+
+// ── PROGRESS ───────────────────────────────────────────
+function updateProgress() {
+  const cards = document.querySelectorAll(`#form-${currentForm} .section-card`);
+  const total = cards.length;
+  const done = document.querySelectorAll(`#form-${currentForm} .section-card.completed`).length;
+  const pct = total > 0 ? Math.round((done / total) * 100) : 0;
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-label').textContent = `${done} of ${total} sections complete`;
+}
+
+document.querySelectorAll('input[type="text"], textarea').forEach(inp => {
+  inp.addEventListener('input', () => {
+    const card = inp.closest('.section-card');
+    if (card) { updateSectionStatus(card); updateProgress(); }
+  });
+});
+
+// ── HELPERS ────────────────────────────────────────────
+function getRadioVal(name) {
+  const sel = Array.from(document.querySelectorAll(`input[name="${name}"]`))
+    .find(r => r.closest('.radio-opt.selected, .radio-opt.selected-yes, .radio-opt.selected-no'));
+  if (!sel) return '—';
+  const lbl = sel.closest('.radio-opt');
+  let txt = lbl.textContent.replace('Other', '').trim().replace(/^[✅❌🏢🌧️🔄⚡🔵⛽]/u, '').trim();
+  if (sel.dataset.other) {
+    const oth = document.getElementById(sel.dataset.other)?.querySelector('input')?.value?.trim();
+    if (oth) txt = 'Other: ' + oth;
+  }
+  return txt || '—';
+}
+
+function getGateAnswer(gateId) {
+  const target = document.getElementById(gateId);
+  return (target && target.classList.contains('visible')) ? 'Yes' : 'No';
+}
+
+function getCheckedItems(groupId) {
+  const items = document.querySelectorAll(`#${groupId} .check-opt.selected`);
+  if (!items.length) return '—';
+  return Array.from(items).map(el => {
+    const name = el.dataset.name;
+    if (!name) return el.textContent.trim();
+    const prefix = el.dataset.item || '';
+    const detailId = prefix + '-detail-' + name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+    const panel = document.getElementById(detailId);
+    let detail = '';
+    if (panel) {
+      const activeQty = panel.querySelector('.qty-btn.active');
+      const notes = Array.from(panel.querySelectorAll('input[type="text"]')).map(i => i.value.trim()).filter(Boolean).join('; ');
+      if (activeQty) detail += ' × ' + activeQty.textContent;
+      if (notes) detail += ' — ' + notes;
+    }
+    return name + detail;
+  }).join('\n');
+}
+
+// ── GENERATE SUMMARY ───────────────────────────────────
+function generateSummary() {
+  const now = new Date().toLocaleDateString('en-GB', {weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  const ver = 'Form v' + FORM_VERSION;
+  let html = '';
+
+  document.getElementById('modal-title').textContent = '📋 Equipment Request Summary';
+
+  const custName    = document.getElementById('cust-name')?.value || '—';
+  const custAddr    = document.getElementById('cust-addr')?.value || '—';
+  const custContact = document.getElementById('cust-contact')?.value || '—';
+  const special     = document.getElementById('cust-special')?.value || '—';
+  const bdm         = document.getElementById('cust-bdm')?.value || '—';
+
+  html += row2('📅 Submission Details', [['Date', now + ' · ' + ver], ['Submitted by (BDM/CM)', bdm]]);
+  html += row2('🏢 Customer Details', [
+    ['Customer / Site Name', custName],
+    ['Address', custAddr],
+    ['Point of Contact', custContact],
+    ['Special Site Circumstances', special],
+  ]);
+
+  // ── FIXED PLANT ──────────────────────────────────────
+  html += '<div class="summary-section-heading">🏭 Fixed Plant</div>';
+
+  const eqs = [
+    { label:'Compactor',              gate:'fp-compactor-fields',  rows:[
+      ['Waste Material', getRadioVal('fp-comp1-waste')],
+      ['Loading Method', getRadioVal('fp-comp1-load')],
+      ['Orientation',    getRadioVal('fp-comp1-orient')],
+      ['Quantity (Spec 1)', getRadioVal('fp-comp1-qty')],
+      ['Second Specification?', getGateAnswer('fp-comp2-fields')],
+    ]},
+    { label:'Vertical Baler',         gate:'fp-vbaler-fields',     rows:[
+      ['Waste Material', getRadioVal('fp-vb-waste')],
+      ['Cardboard Size at Baling', getRadioVal('fp-vb-cbsize')],
+      ['Cardboard Thickness', getRadioVal('fp-vb-cbthick')],
+      ['Quantity', getRadioVal('fp-vb-qty')],
+    ]},
+    { label:'Horizontal Semi-Auto Baler', gate:'fp-hbaler-fields', rows:[
+      ['Loading Method', getRadioVal('fp-hb-load')],
+      ['Orientation',    getRadioVal('fp-hb-orient')],
+      ['Quantity',       getRadioVal('fp-hb-qty')],
+    ]},
+    { label:'Roll Packer',            gate:'fp-roll-fields',       rows:[
+      ['Type',        getRadioVal('fp-roll-type')],
+      ['Safety Cage', getRadioVal('fp-roll-cage')],
+    ]},
+    { label:'Fully Auto Baler',       gate:'fp-autobaler-fields',  rows:[
+      ['Loading Method', getRadioVal('fp-ab-load')],
+    ]},
+    { label:'Wood Compactor',         gate:'fp-wood-fields',       rows:[
+      ['Wood Waste Size', getRadioVal('fp-wood-size')],
+    ]},
+    { label:'Porta Packer',           gate:'fp-porta-fields',      rows:[
+      ['Safety Cage',      getRadioVal('fp-porta-cage')],
+      ['Space Constraints', getRadioVal('fp-porta-space')],
+    ]},
+  ];
+
+  eqs.forEach(s => {
+    const req = getGateAnswer(s.gate);
+    let rows = [['Required?', req]];
+    if (req === 'Yes') rows = rows.concat(s.rows);
+    html += row2((req === 'Yes' ? '✅' : '❌') + ' ' + s.label, rows);
+  });
+
+  const otherItems = getCheckedItems('fp-other-checks');
+  const otherReq = getGateAnswer('fp-other-fields');
+  html += row2((otherReq === 'Yes' ? '✅' : '❌') + ' Other Fixed Equipment', [
+    ['Required?', otherReq],
+    ...(otherReq === 'Yes' ? [['Items Selected', otherItems]] : []),
+  ]);
+
+  // ── MOBILE PLANT ─────────────────────────────────────
+  html += '<div class="summary-section-heading">🚜 Mobile Plant</div>';
+
+  const meqs = [
+    { label:'Forklift Trucks', gate:'mp-flt-fields', rows:[
+      ['Quantity',              getRadioVal('mp-flt-qty')],
+      ['Fuel Type',             getRadioVal('mp-flt-fuel')],
+      ['Size',                  getRadioVal('mp-flt-size')],
+      ['Attachments',           getRadioVal('mp-flt-attach')],
+      ['Current Fleet Make',    getRadioVal('mp-flt-make')],
+      ['Operating Environment', getRadioVal('mp-flt-env')],
+      ['Public Highway Use',    getRadioVal('mp-flt-highway')],
+      ['Non-Marking Tyres',     getRadioVal('mp-flt-tyres')],
+      ['Used for Towing',       getRadioVal('mp-flt-tow')],
+    ]},
+    { label:'Electric Vehicles', gate:'mp-ev-fields', rows:[
+      ['Tow / Trailer Requirement', getRadioVal('mp-ev-tow')],
+      ['Operating Environment',     getRadioVal('mp-ev-env')],
+      ['Public Highway Use',        getRadioVal('mp-ev-highway')],
+    ]},
+    { label:'Tipper Skips', gate:'mp-skip-fields', rows:[
+      ['Size',     getRadioVal('mp-skip-size')],
+      ['Quantity', getRadioVal('mp-skip-qty')],
+    ]},
+  ];
+
+  meqs.forEach(s => {
+    const req = getGateAnswer(s.gate);
+    let rows = [['Required?', req]];
+    if (req === 'Yes') rows = rows.concat(s.rows);
+    html += row2((req === 'Yes' ? '✅' : '❌') + ' ' + s.label, rows);
+  });
+
+  const mOtherItems = getCheckedItems('mp-other-checks');
+  const mOtherReq = getGateAnswer('mp-other-fields');
+  html += row2((mOtherReq === 'Yes' ? '✅' : '❌') + ' Other Mobile Plant', [
+    ['Required?', mOtherReq],
+    ...(mOtherReq === 'Yes' ? [['Items Selected', mOtherItems]] : []),
+  ]);
+
+  document.getElementById('modal-body').innerHTML = html;
+  document.getElementById('summary-modal').classList.add('open');
+  document.body.classList.add('modal-open');
+}
+
+
+function row2(heading, pairs) {
+  let html = `<div class="summary-section"><h3>${heading}</h3>`;
+  pairs.forEach(([label, val]) => {
+    const valHtml = (val || '—').replace(/\n/g, '<br>');
+    html += `<div class="summary-row"><span class="s-label">${label}</span><span class="s-value">${valHtml}</span></div>`;
+  });
+  html += '</div>';
+  return html;
+}
+
+function closeModal() {
+  document.getElementById('summary-modal').classList.remove('open');
+  document.body.classList.remove('modal-open');
+}
+
+// ── DETECT iOS — relabel Download button to "Share" ───
+(function() {
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS && navigator.share) {
+    // Relabel once DOM is ready
+    document.addEventListener('DOMContentLoaded', function() {
+      const btn = document.getElementById('dl-btn');
+      if (btn) btn.innerHTML = '📤 Share / Send to Teams';
+    });
+    // Also relabel when modal opens (in case DOMContentLoaded already fired)
+    document.addEventListener('click', function(e) {
+      if (e.target && (e.target.id === 'print-btn' || e.target.closest('.btn-primary[onclick*="generateSummary"]'))) {
+        setTimeout(function() {
+          const btn = document.getElementById('dl-btn');
+          if (btn && btn.innerHTML.includes('Download')) btn.innerHTML = '📤 Share / Send to Teams';
+        }, 100);
+      }
+    });
+  }
+})();
+
+// ── COPY SUMMARY ──────────────────────────────────────
+function copySummary() {
+  const src = document.getElementById('modal-body');
+  if (!src) return;
+
+  // Build plain-text version from the DOM
+  let lines = [];
+  const title = document.getElementById('modal-title');
+  if (title) lines.push(title.textContent.trim(), '');
+
+  src.querySelectorAll('.summary-section-heading').forEach(heading => {
+    lines.push('', '── ' + heading.textContent.trim() + ' ──', '');
+  });
+
+  // Rebuild in document order
+  lines = [];
+  if (title) lines.push(title.textContent.trim(), '');
+
+  src.childNodes.forEach(function walk(node) {
+    if (node.nodeType === 3) {
+      const t = node.textContent.trim();
+      if (t) lines.push(t);
+    } else if (node.nodeType === 1) {
+      const tag = node.tagName;
+      if (tag === 'TABLE') {
+        node.querySelectorAll('tr').forEach(row => {
+          const cells = Array.from(row.querySelectorAll('td,th')).map(c => c.textContent.trim());
+          if (cells.some(c => c)) lines.push(cells.join('  |  '));
+        });
+      } else if (node.classList.contains('summary-section-heading')) {
+        lines.push('', '═══ ' + node.textContent.trim() + ' ═══', '');
+      } else if (tag === 'H3') {
+        lines.push('', '--- ' + node.textContent.trim() + ' ---');
+      } else if (tag === 'P' || tag === 'DIV' || tag === 'SECTION') {
+        node.childNodes.forEach(c => walk(c));
+      } else {
+        const t = node.textContent.trim();
+        if (t) lines.push(t);
+      }
+    }
+  });
+
+  const text = lines.join('\n');
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('copy-btn');
+      if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.innerHTML = '📋 Copy Summary'; }, 2500); }
+    }).catch(() => fallbackCopy(text));
+  } else {
+    fallbackCopy(text);
+  }
+}
+
+function fallbackCopy(text) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-999px;left:-999px;opacity:0;';
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    document.execCommand('copy');
+    const btn = document.getElementById('copy-btn');
+    if (btn) { btn.textContent = '✅ Copied!'; setTimeout(() => { btn.innerHTML = '📋 Copy Summary'; }, 2500); }
+  } catch(e) { alert('Could not copy — please select and copy the summary text manually.'); }
+  document.body.removeChild(ta);
+}
+
+// ── DOWNLOAD SUMMARY AS HTML FILE ─────────────────────
+function downloadSummary() {
+  const src = document.getElementById('modal-body');
+  if (!src) return;
+
+  const custName = (document.getElementById('cust-name')||{}).value || 'Equipment Request';
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+  const filename = 'Axil-Equipment-Request-' + dateStr.replace(/ /g,'-') + '.html';
+
+  const html = buildSummaryHTML(src, custName, dateStr);
+
+  const btn = document.getElementById('dl-btn');
+  function markDone(label) {
+    if (btn) {
+      btn.textContent = label || '✅ Done!';
+      setTimeout(() => { btn.innerHTML = '⬇️ Download / Share'; }, 2500);
+    }
+  }
+
+  // ── iOS: use Web Share API — opens share sheet (Teams, Mail, Files, etc.)
+  const isIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) ||
+                (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (isIOS && navigator.share) {
+    const blob = new Blob([html], {type: 'text/html'});
+    const file = new File([blob], filename, {type: 'text/html'});
+    const shareData = { files: [file], title: 'Axil Equipment Request — ' + custName };
+    if (navigator.canShare && navigator.canShare(shareData)) {
+      navigator.share(shareData)
+        .then(() => markDone('✅ Shared!'))
+        .catch(err => { if (err.name !== 'AbortError') fallbackDownload(html, filename, markDone); });
+      return;
+    }
+  }
+
+  // ── Artifact viewer (claude.ai)
+  if (window.claude && window.claude.use) {
+    window.claude.use('downloads').then(function(downloads) {
+      if (downloads) {
+        downloads.save({ filename: filename, data: html }).then(() => markDone('✅ Downloaded!')).catch(function() {
+          fallbackDownload(html, filename, () => markDone('✅ Downloaded!'));
+        });
+      } else {
+        fallbackDownload(html, filename, () => markDone('✅ Downloaded!'));
+      }
+    });
+  } else {
+    // ── Desktop / Teams / OneDrive
+    fallbackDownload(html, filename, () => markDone('✅ Downloaded!'));
+  }
+}
+
+function fallbackDownload(html, filename, cb) {
+  // Standard browser download — works in Teams, OneDrive, Safari, Chrome, Edge
+  const blob = new Blob([html], {type: 'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(() => URL.revokeObjectURL(url), 5000);
+  if (cb) cb();
+}
+
+// ── SAVE TO TEAMS (Power Automate webhook) ────────────
+// Show the button only when a webhook URL is configured
+document.addEventListener('DOMContentLoaded', function() {
+  if (TEAMS_WEBHOOK_URL && TEAMS_WEBHOOK_URL.trim()) {
+    const wrap = document.getElementById('teams-save-wrap');
+    if (wrap) wrap.style.display = 'block';
+  }
+});
+
+function saveToTeams() {
+  const src = document.getElementById('modal-body');
+  if (!src) return;
+  if (!TEAMS_WEBHOOK_URL) return;
+
+  const btn = document.getElementById('teams-btn');
+  const status = document.getElementById('teams-status');
+  const origBtnHTML = btn.innerHTML; // save to restore after success/error
+  const custName = (document.getElementById('cust-name')||{}).value || 'Unknown Customer';
+  const dateStr = new Date().toLocaleDateString('en-GB', {day:'2-digit',month:'short',year:'numeric'});
+  const filename = 'Equipment-Request-' + custName.replace(/[^a-zA-Z0-9]/g,'-') + '-' + dateStr.replace(/ /g,'-') + '.html';
+
+  // Build a clean standalone HTML summary file
+  const html = buildSummaryHTML(src, custName, dateStr);
+
+  btn.disabled = true;
+  btn.textContent = 'Saving…';
+  if (status) { status.style.color = '#666'; status.textContent = 'Sending to Teams…'; }
+
+  var payload = JSON.stringify({
+    customer_name: custName,
+    date: dateStr,
+    filename: filename,
+    html_content: html,
+    form_version: FORM_VERSION
+  });
+
+  // no-cors fetch: Content-Type: text/plain is a CORS-safelisted simple header —
+  // no OPTIONS preflight fires, so it works from any HTTPS origin including
+  // Netlify. Power Automate receives the raw JSON string; triggerBody() returns
+  // it and json(string(triggerBody()))['fieldname'] parses it correctly.
+  // The response is always opaque (status=0, type="opaque") — .then() fires on
+  // any completed request, .catch() only on a genuine network failure.
+  fetch(TEAMS_WEBHOOK_URL, {
+    method: 'POST',
+    mode: 'no-cors',
+    headers: { 'Content-Type': 'text/plain' },
+    body: payload
+  }).then(function() {
+    btn.disabled = false;
+    btn.innerHTML = '<span>✅</span> Saved to Teams!';
+    if (status) { status.style.color = '#1a7a3c'; status.textContent = 'The summary has been saved to your Teams channel.'; }
+    setTimeout(function() {
+      btn.innerHTML = origBtnHTML;
+      if (status) status.textContent = '';
+    }, 4000);
+  }).catch(function() {
+    btn.disabled = false;
+    btn.innerHTML = origBtnHTML;
+    if (status) { status.style.color = '#c0392b'; status.textContent = 'Could not reach Teams — check your connection and try again.'; }
+    setTimeout(function() { if (status) status.textContent = ''; }, 5000);
+  });
+}
+
+function buildSummaryHTML(src, custName, dateStr) {
+  return `<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Equipment Request — ${custName}</title>
+<style>
+  body{font-family:system-ui,-apple-system,sans-serif;margin:0;padding:0;background:#f4f6f9;color:#1a1a1a;}
+  .header{background:#1b3a5c;color:white;padding:20px 28px;}
+  .header h1{margin:0 0 4px;font-size:20px;}
+  .header p{margin:0;opacity:.75;font-size:13px;}
+  .content{max-width:800px;margin:24px auto;padding:0 16px 48px;}
+  .summary-section-heading{background:#1b3a5c;color:white;padding:9px 16px;margin:20px 0 0;font-weight:700;font-size:14px;border-radius:6px 6px 0 0;}
+  .summary-section{background:white;border:1px solid #dde1e7;border-top:none;border-radius:0 0 6px 6px;overflow:hidden;margin-bottom:4px;}
+  .summary-section h3{background:#f4f6f9;padding:8px 14px;margin:0;font-size:13px;border-bottom:1px solid #dde1e7;}
+  table{width:100%;border-collapse:collapse;font-size:13px;}
+  td{padding:7px 14px;border-bottom:1px solid #f0f2f5;vertical-align:top;}
+  td:first-child{font-weight:600;color:#374151;width:40%;background:#fafbfc;}
+  .print-btn{display:block;margin:24px auto 0;padding:12px 32px;background:#e8640a;color:white;border:none;border-radius:8px;font-size:15px;font-weight:700;cursor:pointer;}
+  @media print{.print-btn{display:none;}}
+</style>
+</head><body>
+<div class="header">
+  <h1>Axil Integrated Services — New Equipment Request</h1>
+  <p>Generated ${dateStr} &nbsp;·&nbsp; v${FORM_VERSION}</p>
+</div>
+<div class="content">${src.innerHTML}</div>
+<button class="print-btn" onclick="window.print()">🖨️ Print / Save as PDF</button>
+</body></html>`;
+}
+
+// ── PRINT SUMMARY ─────────────────────────────────────
+function printSummary() {
+  // Copy modal body content into a dedicated #print-container at the top
+  // of <body>. @media print then hides everything EXCEPT that container.
+  // This approach is reliable on iOS Safari (AirPrint) as well as desktop.
+  const src = document.getElementById('modal-body');
+  const dest = document.getElementById('print-container');
+  if (!src || !dest) { window.print(); return; }
+
+  dest.innerHTML = src.innerHTML;
+
+  // Restore after printing (afterprint fires on iOS too)
+  function cleanup() {
+    dest.innerHTML = '';
+    window.removeEventListener('afterprint', cleanup);
+  }
+  window.addEventListener('afterprint', cleanup);
+
+  window.print();
+}
+
+// ── INIT ───────────────────────────────────────────────
+updateProgress();
+</script>
+<div id="print-container"></div>
+</body>
+</html>
+<!--
+════════════════════════════════════════════════════════════
+  HOW TO ENABLE "SAVE TO TEAMS" — Power Automate Setup
+  (One-time setup by Jason / IT — takes about 15 minutes)
+════════════════════════════════════════════════════════════
+
+STEP 1 — Create the Power Automate flow
+  1. Go to https://make.powerautomate.com
+  2. Click "Create" → "Instant cloud flow"
+  3. Name it: "Axil Equipment Request — Save to Teams"
+  4. Trigger: search for "When a HTTP request is received" → Select it
+  5. Click "Create"
+
+STEP 2 — Configure the HTTP trigger
+  In the trigger, paste this JSON schema into "Request Body JSON Schema":
+
+  {
+    "type": "object",
+    "properties": {
+      "customer_name": { "type": "string" },
+      "date":          { "type": "string" },
+      "filename":      { "type": "string" },
+      "html_content":  { "type": "string" },
+      "form_version":  { "type": "string" }
+    }
+  }
+
+STEP 3 — Add a "Create file" action
+  1. Click "+ New step"
+  2. Search for "SharePoint" → "Create file"
+  3. Configure:
+     - Site Address: your Axil SharePoint site (same as Teams)
+     - Folder Path: the channel's document folder, e.g.
+         /sites/AxilOps/Shared Documents/New Equipment Requests
+     - File Name:  use the dynamic value "filename" from the trigger
+     - File Content: use the dynamic value "html_content" from the trigger
+
+STEP 4 — Save and get the webhook URL
+  1. Click "Save"
+  2. Copy the "HTTP POST URL" from the trigger step
+     (looks like: https://prod-xx.westeurope.logic.azure.com/...)
+
+STEP 5 — Paste the URL into this file
+  1. Open axil-equipment-request.html in a text editor (Notepad, VS Code)
+  2. Find this line near the top of the <script>:
+         const TEAMS_WEBHOOK_URL = "";
+  3. Paste your URL between the quotes:
+         const TEAMS_WEBHOOK_URL = "https://prod-xx...";
+  4. Save the file and re-upload it to Teams
+
+After that, every user will see a blue "Save to Teams" button
+in the summary modal. One tap → file appears in the Teams channel.
+════════════════════════════════════════════════════════════
+-->
