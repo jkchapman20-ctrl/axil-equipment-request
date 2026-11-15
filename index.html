@@ -1602,7 +1602,8 @@
     </div>
 
     <div class="submit-area">
-      <div class="submit-title">🚜 Ready to submit your Mobile Plant request?</div>
+      <div class="submit-title">🚜 Ready to submit your Equipment request?</div>
+      <div class="submit-sub">Review your answers for both Fixed and Mobile Plant, then generate your combined summary for the SOS.</div>
 
     </div>
 
@@ -1610,7 +1611,6 @@
 
   <!-- ── COMBINED GENERATE BUTTON ───────────────────── -->
   <div class="submit-wrap" style="margin-top:28px;">
-    <div class="submit-sub">Review your answers for both Fixed and Mobile Plant, then generate your combined summary for the SOS.</div>
     <button class="btn-primary" onclick="generateSummary()">📋 Generate Full Summary for SOS</button>
   </div>
 
@@ -1628,13 +1628,11 @@
       </div>
       <div id="modal-body"></div>
       <div style="background:#fff8f4;border:1.5px solid #f4c9ae;border-radius:8px;padding:11px 16px;margin-top:20px;font-size:13px;color:#7a3010;display:flex;flex-direction:column;gap:7px;">
-        <div>💾 <strong>Remember:</strong> Once printed or saved, file a copy in the shared folder <strong>(location TBC)</strong> so your SOS can access it.</div>
+        <div>💾 <strong>Remember:</strong> Click the blue <strong>Save to Teams</strong> button — you will see a confirmation that it has saved.</div>
         <div>⚠️ <strong>BDMs &amp; CMs:</strong> Missing information will delay the equipment specification and quotes back to you — ensure all sections are fully completed before submitting.</div>
       </div>
       <div class="modal-actions">
         <button class="btn-secondary" onclick="closeModal()">← Go Back &amp; Edit</button>
-        <button class="btn-outline" id="copy-btn" onclick="copySummary()">📋 Copy Text</button>
-        <button class="btn-outline" id="dl-btn" onclick="downloadSummary()">⬇️ Download / Share</button>
         <button class="btn-primary" id="print-btn" onclick="printSummary()">🖨️ Print / PDF</button>
       </div>
       <!-- Teams save button — shown only when TEAMS_WEBHOOK_URL is configured -->
@@ -1644,9 +1642,6 @@
           Save to Teams
         </button>
         <div id="teams-status" style="margin-top:8px;font-size:12px;text-align:center;min-height:18px;"></div>
-      </div>
-      <div id="save-hint" style="margin-top:10px;font-size:12px;color:#666;text-align:center;line-height:1.6;">
-        💡 On iPhone tap <strong>Download / Share</strong> to send directly to Teams or save to Files.
       </div>
     </div>
   </div>
